@@ -1,0 +1,22 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.8.3",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.2",
+    "express": "^4.17.1",
+    "node-sass": "^4.13.1",
+    "phaser": "^3.21.0",
+    "sass-loader": "^8.0.2",
+    "socket.io": "^2.3.0",
+    "style-loader": "^1.1.3"
+  }
+}
