@@ -1,10 +1,9 @@
 import Player from '../sprites/Player';
-import Enemy from '../sprites/Enemy';
 import socket from '../../ws';
 
-let player;
-let enemy;
 let cursors;
+let player;
+let players = [];
 
 class Game extends Phaser.Scene {
   constructor() {
@@ -28,34 +27,36 @@ class Game extends Phaser.Scene {
     );
   }
 
-  create() {
+  create () {
     this.add.image(0, 0, 'background').setOrigin(0, 0).setScrollFactor(0);
-    player = new Player({
-      scene: this,
-      key: 'player',
-      x: 100,
-      y: -450
-    });
 
-    socket.emit('player_join', {
-      username: 'player_username'
-    });
-
-    socket.on('player_joined', data => {
-      console.log(data);
-      enemy = new Enemy({
-        scene: this,
-        key: 'enemy',
-        x: 200,
-        y: -450
-      });
+    socket.emit('join');
+    
+    socket.on('player', data => {
+      if (data.isSelf) {
+        console.log("Player");
+        player = new Player({
+          scene: this,
+          key: 'player',
+          x: data.x,
+          y: data.y
+        });
+        this.physics.add.collider(player, pipe);
+      } else {
+        console.log("Enemy");
+        let enemy = new Player({
+          scene: this,
+          key: 'player',
+          x: data.x,
+          y: data.y
+        });
+        this.physics.add.collider(enemy, pipe);
+      }
     });
 
     let pipe = this.physics.add.staticGroup();
 
     pipe.create(500, 400, 'pipe');
-
-    this.physics.add.collider(player, pipe);
 
     // Cursors
     cursors = this.input.keyboard.createCursorKeys();
@@ -64,13 +65,14 @@ class Game extends Phaser.Scene {
     let camera_width = this.cameras.main.width * Number.MAX_VALUE;
     let camera_height = this.cameras.main.height;
     // World size + Follow Player
-    this.cameras.main.startFollow(player);
     this.cameras.main.setBounds(0, 0, camera_width, camera_height);
     this.scene.scene.physics.world.setBounds(0, 0, camera_width, camera_height);
   }
 
   update() {
-    player.update(cursors);
+    if (player && cursors) {
+      player.update(cursors);
+    }
   }
 }
 

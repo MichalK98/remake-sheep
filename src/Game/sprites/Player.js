@@ -1,3 +1,5 @@
+import socket from "../../ws";
+
 let jump = true;
 
 class Player extends Phaser.GameObjects.Sprite {

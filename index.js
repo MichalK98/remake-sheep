@@ -8,29 +8,45 @@ var app = express()
 const io = require('socket.io')(8080);
 
 var connection_count = 0;
-var player;
+var player = {};
 var players = [];
+
 io.on('connection', socket => {
   connection_count++;
+  console.log(connection_count);
 
   socket.on('disconnect', () => {
     connection_count--;
+    console.log(connection_count);
 
-    // Remove player from array
     players = players.filter(function( obj ) {
       return obj.id !== socket.id;
     });
+    console.log(players)
   });
 
-  socket.on('player_join', data => {
-    player =  {
+  socket.on('join', () => {
+    let player = {
       id: socket.id,
-      name: data.username
-    }
+      name: "player",
+      x: 200,
+      y: -450
+    };
+    
+    socket.emit('player', {
+      ...player,
+      isSelf: true
+    });
+    socket.broadcast.emit("player", {
+      ...player
+    });
+    players.forEach(e => {
+      socket.emit('player', {
+        ...player
+      });
+    });
     players.push(player);
-    socket.broadcast.emit('player_joined', player);
   });
-
 });
 
 
